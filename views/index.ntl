@@ -1,0 +1,25 @@
+<html>
+  <style>
+  body,input,select {
+    font-size: 15px;
+  }
+  </style>
+  <body style="font-size: 17px;">
+    <form method="get">
+      <input type="text" name="imageUrl" value="#formField#" placeholder="Image Url" style="width:400px;" />
+      <input type="text" name="lang" value="#lang#" placeholder="Lang" />
+      <select value="#type#" name="type">
+        <option value="block">Block</option>
+        <option value="paragraph">Paragraph</option>
+      </select>
+
+      <label style="margin-left: 15px;" for="saveCbx">Save?</label>
+      <input type="checkbox" id="saveCbx" name="save" value="Save">
+      <input type="submit" value="Submit" />
+    </form>
+    <div style="display:flex;">
+      <img src="#translatedImageUrl#" style="width:60%; margin-right:50px;" />
+      <p>#translatedText#</p>
+    </div>
+  </body>
+</html>
