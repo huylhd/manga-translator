@@ -4,6 +4,11 @@ import { getTranslatedImage } from "./translate-image";
 
 const app = express();
 
+// Create images folder
+if (!fs.existsSync("images")) {
+  fs.mkdirSync("images");
+}
+
 // Template engine
 app.engine("ntl", (filePath, options: any, callback) => {
   fs.readFile(filePath, (err, content) => {
