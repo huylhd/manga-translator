@@ -56,7 +56,7 @@ export const writeTextToImage = async ({
   image.print(font, topLeft.x, topLeft.y, text, topRight.x - topLeft.x);
 
   // Save image
-  const translatedImagePath = "images/translatedImage.png";
+  const translatedImagePath = "public/translated-images/translatedImage.png";
   image.write(translatedImagePath);
 
   return translatedImagePath;

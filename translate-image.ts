@@ -27,7 +27,7 @@ export const getTranslatedImage = ({
 }> => {
   // Base64 encode for url to save
   const filename = encode(Buffer.from(imageUrl).toString("base64"));
-  const saveImageUrl = `images/${filename}.png`;
+  const saveImageUrl = `public/translated-images/${lang}_${type}_${filename}.png`;
 
   // Try to find saved image
   try {
@@ -41,7 +41,7 @@ export const getTranslatedImage = ({
   return new Promise((resolve) => {
     request.get(imageUrl, function (error: any, response: any, body: any) {
       if (!error && response.statusCode == 200) {
-        let data = Buffer.from(body).toString("base64");
+        const data = Buffer.from(body).toString("base64");
         axios
           .post(
             `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
@@ -117,7 +117,10 @@ export const getTranslatedImage = ({
               return resolve({ imageUrl, translatedText });
             }
           })
-          .catch(() => resolve({ imageUrl: "", translatedText: "" }));
+          .catch((err) => {
+            console.log(err);
+            return resolve({ imageUrl: "", translatedText: "" });
+          });
       }
     });
   });
@@ -138,7 +141,7 @@ async function writeBlock(
     imageUrl,
     text: translatedText,
     rectData,
-    fontSize: "14",
+    fontSize: "17",
   });
   return { imageUrl, translatedText };
 }
