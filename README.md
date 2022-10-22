@@ -1,24 +1,35 @@
 # translate-image-text
 
-Translate text in images using Vision API, Translation API and Jimp
-
-![Alt text](public/images/ti2.gif?raw=true "GIF")
+Translate text in images using Vision API, Translation API
+Rendered using React and canvas
 
 ## Installation
 
 1. [Create a Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects), enable Vision API and Translation API
-2. Clone the repo and install dependencies
+2. Clone the repo
    ```sh
    git clone https://github.com/huylhd/translate-image-text.git
+   cd translate-image-text
    ```
+3. Install dependencies using yarn
+
+   For backend
+
    ```sh
-   cd translate-image-text && yarn
+    yarn
    ```
-3. Create an `.env` file and enter your GCloud API key
+
+   For frontend
+
+   ```sh
+    cd frontend && yarn
+   ```
+
+4. Create an `.env` file and enter your GCloud API key
    ```sh
    echo "API_KEY=your_api_key" > .env
    ```
-4. Run the project
+5. Run the project
    ```sh
    yarn start
    ```
