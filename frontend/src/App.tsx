@@ -11,7 +11,10 @@ import { handleDrawImage, handleDrawText } from "./utils/canvas";
 import { ISocketMessage } from "./interfaces/socketMessage";
 import { cloneDeep, last } from "lodash";
 import { IFormData } from "./interfaces/formData";
-const socket = io("http://localhost:1001");
+
+const baseApiPath: string =
+  process.env.REACT_APP_BASE_API || "http://localhost:1001";
+const socket = io(baseApiPath);
 
 function App() {
   const [formData, setFormData] = useState<IFormData>({
@@ -72,7 +75,7 @@ function App() {
     setImageList([]);
     setTextList([]);
     e.preventDefault();
-    axios.post(`http://localhost:1001/${socket.id}`, formData);
+    axios.post(`${baseApiPath}/${socket.id}`, formData);
   };
 
   const getText = useCallback(
@@ -176,12 +179,9 @@ function App() {
       </Form>
       <div>
         {imageList.map((item) => (
-          <div
-            key={item.canvasId}
-            className="d-flex flex-row mb-5 justify-content-between"
-          >
+          <div key={item.canvasId} className="d-flex flex-row mb-5">
             <canvas id={item.canvasId}></canvas>
-            <div style={{ width: "370px", maxWidth: "100%" }}>
+            <div className="ms-5" style={{ width: "370px", maxWidth: "100%" }}>
               <h4>Translated Text</h4>
               {getText(item.canvasId) && (
                 <Tabs className="mb-3" justify>
