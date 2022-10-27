@@ -59,7 +59,7 @@ export const fillText = ({ ctx, text, vertices, fontSize = 18 }: any) => {
   ctx.fillStyle = "#000000";
   const [topLeft, topRight] = vertices;
   const x = topLeft.x + 10;
-  const y = topLeft.y + 20;
+  const y = topRight.y + 10;
   const maxWidth = topRight.x - topLeft.x;
   wrapText({ ctx, text, x, y, maxWidth, lineHeight: fontSize * 1 });
 };

@@ -1,3 +1,4 @@
+/* eslint-disable no-delete-var */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
@@ -9,7 +10,7 @@ import Tabs from "react-bootstrap/Tabs";
 import io from "socket.io-client";
 import { handleDrawImage, handleDrawText } from "./utils/canvas";
 import { ISocketMessage } from "./interfaces/socketMessage";
-import { cloneDeep, last } from "lodash";
+import { last } from "lodash";
 import { IFormData } from "./interfaces/formData";
 
 const baseApiPath: string =
@@ -83,35 +84,55 @@ function App() {
     [textList]
   );
 
-  /**
-   * Handle manually update translated text
-   * @param e
-   * @param canvasId
-   * @param id
-   * @returns
-   */
-  const handleChangeText = async (e: any, canvasId: string, id: number) => {
-    const index = textList.findIndex((item) => item.canvasId === canvasId);
-    if (index < 0) return;
-
-    const newTextList = cloneDeep(textList);
-    const txtItem = newTextList[index];
-    if (!txtItem.textData) return;
-    txtItem.isEdited = true;
-
-    let blockIndex = txtItem.textData.findIndex((item) => item.id === id);
-    if (blockIndex < 0) return;
-    if (e.target.value === "") {
-      txtItem.textData.splice(blockIndex, 1);
-    } else {
-      const block = JSON.parse(e.target.value);
-      txtItem.textData[blockIndex] = block;
+  const handleUpdateText = (
+    e: any,
+    canvasId: string,
+    blockId: number,
+    pos: "text" | "x1" | "x2" | "y1" | "y2" | "delete"
+  ) => {
+    let val = e.target.value;
+    if (pos !== "text") {
+      val = Number(val);
     }
-
-    newTextList[index] = txtItem;
+    const newTextList = [...textList];
+    const txtItem = newTextList.find((item) => item.canvasId === canvasId);
+    if (!txtItem) {
+      return;
+    }
+    const blockItem = txtItem.textData.find((bl) => bl.id === blockId);
+    if (!blockItem) {
+      return;
+    }
+    switch (pos) {
+      case "text":
+        blockItem.text = val;
+        break;
+      case "x1":
+        blockItem.vertices[0].x = val;
+        break;
+      case "x2":
+        blockItem.vertices[1].x = val;
+        break;
+      case "y1":
+        blockItem.vertices[1].y = val;
+        break;
+      case "y2":
+        blockItem.vertices[2].y = val;
+        break;
+      case "delete":
+        txtItem.textData = txtItem.textData.filter(
+          (bl) => bl.id !== blockItem.id
+        );
+        break;
+      default:
+        return;
+    }
+    console.log(newTextList);
     setTextList(newTextList);
+    redrawText(canvasId, txtItem);
+  };
 
-    // Redraw image
+  const redrawText = async (canvasId: string, txtItem: ISocketMessage) => {
     const imageData = imageList.find((item) => item.canvasId === canvasId);
     if (!imageData) return;
     await handleDrawImage(imageData);
@@ -185,21 +206,97 @@ function App() {
               <h4>Translated Text</h4>
               {getText(item.canvasId) && (
                 <Tabs className="mb-3" justify>
-                  {getText(item.canvasId)?.textData?.map((txtItem, index) => (
+                  {getText(item.canvasId)?.textData.map((block) => (
                     <Tab
-                      key={txtItem.id}
-                      eventKey={`canvas-${item.canvasId}-tab-${txtItem.id}`}
-                      title={txtItem.id}
+                      key={block.id}
+                      eventKey={`canvas-${item.canvasId}-tab-${block.id}`}
+                      title={block.id}
                     >
-                      <Form.Control
-                        as="textarea"
-                        className="mb-3"
-                        style={{ height: "600px" }}
-                        value={JSON.stringify(txtItem, null, 1)}
-                        onChange={(e) =>
-                          handleChangeText(e, item.canvasId, txtItem.id)
+                      <Form.Group className="mb-3">
+                        <h5>Text</h5>
+                        <Form.Control
+                          as="textarea"
+                          value={block.text}
+                          onChange={(e) =>
+                            handleUpdateText(e, item.canvasId, block.id, "text")
+                          }
+                        />
+                      </Form.Group>
+                      <Form.Group className="mb-3">
+                        <h5>Position</h5>
+                        <div className="row">
+                          <div className="col-6 mb-3">
+                            <Form.Label>x1</Form.Label>
+                            <Form.Control
+                              type="number"
+                              value={block.vertices[0].x}
+                              onChange={(e) =>
+                                handleUpdateText(
+                                  e,
+                                  item.canvasId,
+                                  block.id,
+                                  "x1"
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="col-6 mb-3">
+                            <Form.Label>x2</Form.Label>
+                            <Form.Control
+                              type="number"
+                              value={block.vertices[1].x}
+                              onChange={(e) =>
+                                handleUpdateText(
+                                  e,
+                                  item.canvasId,
+                                  block.id,
+                                  "x2"
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="col-6 mb-3">
+                            <Form.Label>y1</Form.Label>
+                            <Form.Control
+                              type="number"
+                              value={block.vertices[1].y}
+                              onChange={(e) =>
+                                handleUpdateText(
+                                  e,
+                                  item.canvasId,
+                                  block.id,
+                                  "y1"
+                                )
+                              }
+                            />
+                          </div>
+                          <div className="col-6 mb-3">
+                            <Form.Label>y2</Form.Label>
+                            <Form.Control
+                              type="number"
+                              value={block.vertices[2].y}
+                              onChange={(e) =>
+                                handleUpdateText(
+                                  e,
+                                  item.canvasId,
+                                  block.id,
+                                  "y2"
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      </Form.Group>
+                      <Form.Group
+                        onClick={(e) =>
+                          handleUpdateText(e, item.canvasId, block.id, "delete")
                         }
-                      />
+                        className="text-center"
+                      >
+                        <Button className="text-right" variant="danger">
+                          Delete Text
+                        </Button>
+                      </Form.Group>
                     </Tab>
                   ))}
                 </Tabs>
