@@ -25,7 +25,7 @@ app.use("/public", express.static("public"));
  * Request image translation
  */
 app.post("/:socketId", (req, res) => {
-  const { type, imageUrl, pattern = "", fontSize } = req.body;
+  const { type, imageUrl, pattern = "", fontSize, target } = req.body;
   const { socketId } = req.params;
   res.send("OK");
   let imageUrls: string[] = [imageUrl];
@@ -33,7 +33,7 @@ app.post("/:socketId", (req, res) => {
   if (type === "sequence" && match && match.length >= 2) {
     imageUrls = getImageSequence(imageUrl, match[1]);
   }
-  return translateImages(imageUrls, fontSize, socketId);
+  return translateImages(imageUrls, fontSize, socketId, target);
 });
 
 const port = process.env.PORT || 1001;

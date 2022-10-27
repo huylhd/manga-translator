@@ -7,7 +7,8 @@ import { getTextFromImage, translateText } from "./gcloud";
 export const translateImages = async (
   imageUrls: string[],
   fontSize: number,
-  socketId: string
+  socketId: string,
+  target = "en"
 ) => {
   const io = getSocket();
   for (let index = 0; index < imageUrls.length; index++) {
@@ -33,7 +34,7 @@ export const translateImages = async (
     getTextFromImage(base64Str).then(async (result: ITextBlock[]) => {
       result = await Promise.all(
         result.map(async (block: any, index) => {
-          block.text = await translateText(block.text);
+          block.text = await translateText(block.text, target);
           block.id = index;
           block.fontSize = fontSize;
           return block;

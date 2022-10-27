@@ -3,4 +3,5 @@ export interface IFormData {
   fontSize: number;
   type: "single" | "sequence";
   pattern?: string;
+  target: "en" | "vi";
 }

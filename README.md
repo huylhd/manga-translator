@@ -1,6 +1,6 @@
-# translate-image-text
+# manga-translator
 
-Translate text in images using Vision API, Translation API
+Manga translator app using Vision API, Translation API
 Rendered using React and canvas
 
 ## Installation
@@ -8,7 +8,7 @@ Rendered using React and canvas
 1. [Create a Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects), enable Vision API and Translation API
 2. Clone the repo
    ```sh
-   git clone https://github.com/huylhd/translate-image-text.git
+   git clone https://github.com/huylhd/manga-translator.git
    cd translate-image-text
    ```
 3. Install dependencies using yarn

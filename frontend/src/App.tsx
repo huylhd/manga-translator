@@ -22,6 +22,7 @@ function App() {
     imageUrl: "",
     fontSize: 20,
     type: "single",
+    target: "en",
   });
   const [imageList, setImageList] = useState<ISocketMessage[]>([]);
   const [textList, setTextList] = useState<ISocketMessage[]>([]);
@@ -181,6 +182,18 @@ function App() {
             />
           </Form.Group>
         )}
+
+        <Form.Group className="mb-3 me-3 col-1">
+          <Form.Label>Language</Form.Label>
+          <Form.Select
+            value={formData.target}
+            name="target"
+            onChange={handleChange}
+          >
+            <option value="en">English</option>
+            <option value="vi">Vietnamese</option>
+          </Form.Select>
+        </Form.Group>
 
         <Form.Group className="mb-3 me-3">
           <Form.Label>Font Size</Form.Label>
