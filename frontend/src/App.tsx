@@ -79,7 +79,7 @@ function App() {
     axios.post(`${baseApiPath}/${socket.id}`, formData);
   };
 
-  const getText = useCallback(
+  const getTextItem = useCallback(
     (canvasId: string) => textList.find((item) => item.canvasId === canvasId),
     [textList]
   );
@@ -127,14 +127,15 @@ function App() {
       default:
         return;
     }
-    console.log(newTextList);
     setTextList(newTextList);
     redrawText(canvasId, txtItem);
   };
 
   const redrawText = async (canvasId: string, txtItem: ISocketMessage) => {
     const imageData = imageList.find((item) => item.canvasId === canvasId);
-    if (!imageData) return;
+    if (!imageData) {
+      return;
+    }
     await handleDrawImage(imageData);
     handleDrawText(txtItem);
   };
@@ -204,9 +205,9 @@ function App() {
             <canvas id={item.canvasId}></canvas>
             <div className="ms-5" style={{ width: "370px", maxWidth: "100%" }}>
               <h4>Translated Text</h4>
-              {getText(item.canvasId) && (
+              {getTextItem(item.canvasId) && (
                 <Tabs className="mb-3" justify>
-                  {getText(item.canvasId)?.textData.map((block) => (
+                  {getTextItem(item.canvasId)?.textData.map((block) => (
                     <Tab
                       key={block.id}
                       eventKey={`canvas-${item.canvasId}-tab-${block.id}`}
