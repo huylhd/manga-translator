@@ -1,12 +1,14 @@
+export interface ITextData {
+  text: string;
+  vertices: { x: number; y: number }[];
+  id: number;
+  fontSize: number;
+}
+
 export interface ISocketMessage {
   canvasId: string;
   base64Str: string;
-  textData: {
-    text: string;
-    vertices: any[];
-    id: number;
-    fontSize: number;
-  }[];
+  textData: ITextData[];
   type: "image" | "text";
   isEdited?: boolean;
 }

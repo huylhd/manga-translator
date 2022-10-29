@@ -2,8 +2,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 
@@ -12,17 +10,22 @@ import { handleDrawImage, handleDrawText } from "./utils/canvas";
 import { ISocketMessage } from "./interfaces/socketMessage";
 import { last } from "lodash";
 import { IFormData } from "./interfaces/formData";
+import { useForm, FormProvider } from "react-hook-form";
+import { TranslateForm } from "./components/TranslateForm";
+import { TextBlock } from "./components/TextBlock";
 
 const baseApiPath: string =
   process.env.REACT_APP_BASE_API || "http://localhost:1001";
 const socket = io(baseApiPath);
 
 function App() {
-  const [formData, setFormData] = useState<IFormData>({
-    imageUrl: "",
-    fontSize: 20,
-    type: "single",
-    target: "en",
+  const methods = useForm<IFormData>({
+    defaultValues: {
+      imageUrl: "",
+      fontSize: 20,
+      type: "single",
+      target: "en",
+    },
   });
   const [imageList, setImageList] = useState<ISocketMessage[]>([]);
   const [textList, setTextList] = useState<ISocketMessage[]>([]);
@@ -63,21 +66,11 @@ function App() {
     handleDrawText(data);
   }, [last(textList)]);
 
-  /**
-   * Handle form fields change
-   */
-  const handleChange = (e: any) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: any) => {
+  const onSubmit = (data: IFormData, e: any) => {
     setImageList([]);
     setTextList([]);
     e.preventDefault();
-    axios.post(`${baseApiPath}/${socket.id}`, formData);
+    axios.post(`${baseApiPath}/${socket.id}`, data);
   };
 
   const getTextItem = useCallback(
@@ -143,75 +136,9 @@ function App() {
 
   return (
     <div className="App px-5 py-3">
-      <Form
-        onSubmit={handleSubmit}
-        className="mb-5 text-left d-flex flex-row align-items-end"
-      >
-        <Form.Group className="mb-3 me-3">
-          <Form.Label>Type</Form.Label>
-          <Form.Select
-            value={formData.type}
-            name="type"
-            onChange={handleChange}
-          >
-            <option value="single">Single</option>
-            <option value="sequence">Sequence</option>
-          </Form.Select>
-        </Form.Group>
-
-        <Form.Group className="mb-3 me-3 col-5">
-          <Form.Label>Image Url</Form.Label>
-          <Form.Control
-            type="text"
-            value={formData.imageUrl}
-            name="imageUrl"
-            onChange={handleChange}
-            placeholder="Enter Image Url"
-          />
-        </Form.Group>
-
-        {formData.type === "sequence" && (
-          <Form.Group className="mb-3 me-3">
-            <Form.Label>Pattern</Form.Label>
-            <Form.Control
-              type="text"
-              value={formData.pattern}
-              name="pattern"
-              onChange={handleChange}
-              placeholder="Enter Pattern"
-            />
-          </Form.Group>
-        )}
-
-        <Form.Group className="mb-3 me-3 col-1">
-          <Form.Label>Language</Form.Label>
-          <Form.Select
-            value={formData.target}
-            name="target"
-            onChange={handleChange}
-          >
-            <option value="en">English</option>
-            <option value="vi">Vietnamese</option>
-          </Form.Select>
-        </Form.Group>
-
-        <Form.Group className="mb-3 me-3">
-          <Form.Label>Font Size</Form.Label>
-          <Form.Control
-            type="number"
-            value={formData.fontSize}
-            name="fontSize"
-            onChange={handleChange}
-            placeholder="Enter Font Size"
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
-        </Form.Group>
-      </Form>
+      <FormProvider {...methods}>
+        <TranslateForm onSubmit={onSubmit} />
+      </FormProvider>
       <div>
         {imageList.map((item) => (
           <div key={item.canvasId} className="d-flex flex-row mb-5">
@@ -226,91 +153,11 @@ function App() {
                       eventKey={`canvas-${item.canvasId}-tab-${block.id}`}
                       title={block.id}
                     >
-                      <Form.Group className="mb-3">
-                        <h5>Text</h5>
-                        <Form.Control
-                          as="textarea"
-                          value={block.text}
-                          onChange={(e) =>
-                            handleUpdateText(e, item.canvasId, block.id, "text")
-                          }
-                        />
-                      </Form.Group>
-                      <Form.Group className="mb-3">
-                        <h5>Position</h5>
-                        <div className="row">
-                          <div className="col-6 mb-3">
-                            <Form.Label>x1</Form.Label>
-                            <Form.Control
-                              type="number"
-                              value={block.vertices[0].x}
-                              onChange={(e) =>
-                                handleUpdateText(
-                                  e,
-                                  item.canvasId,
-                                  block.id,
-                                  "x1"
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="col-6 mb-3">
-                            <Form.Label>x2</Form.Label>
-                            <Form.Control
-                              type="number"
-                              value={block.vertices[1].x}
-                              onChange={(e) =>
-                                handleUpdateText(
-                                  e,
-                                  item.canvasId,
-                                  block.id,
-                                  "x2"
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="col-6 mb-3">
-                            <Form.Label>y1</Form.Label>
-                            <Form.Control
-                              type="number"
-                              value={block.vertices[1].y}
-                              onChange={(e) =>
-                                handleUpdateText(
-                                  e,
-                                  item.canvasId,
-                                  block.id,
-                                  "y1"
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="col-6 mb-3">
-                            <Form.Label>y2</Form.Label>
-                            <Form.Control
-                              type="number"
-                              value={block.vertices[2].y}
-                              onChange={(e) =>
-                                handleUpdateText(
-                                  e,
-                                  item.canvasId,
-                                  block.id,
-                                  "y2"
-                                )
-                              }
-                            />
-                          </div>
-                        </div>
-                      </Form.Group>
-                      <Form.Group
-                        onClick={(e) =>
-                          handleUpdateText(e, item.canvasId, block.id, "delete")
-                        }
-                        className="text-center"
-                      >
-                        <Button className="text-right" variant="danger">
-                          Delete Text
-                        </Button>
-                      </Form.Group>
+                      <TextBlock
+                        handleUpdateText={handleUpdateText}
+                        block={block}
+                        canvasId={item.canvasId}
+                      />
                     </Tab>
                   ))}
                 </Tabs>
