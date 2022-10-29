@@ -58,7 +58,7 @@ export const getImageSequence = (
   initialNumberStr: string,
   limit: number = 50
 ) => {
-  const imageUrls: string[] = [];
+  const imageUrls: string[] = [imageUrl];
   let currentNumber = +initialNumberStr;
   for (let index = 0; index < limit; index++) {
     currentNumber++;
